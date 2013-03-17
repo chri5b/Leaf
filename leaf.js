@@ -39,9 +39,6 @@ function Leaf(config) {
         this.config.slope = 0;
     }
 
-
-
-
     this.rows = [];
 
     for (var i = 0; i < this.config.n ; i++) {
@@ -51,6 +48,8 @@ function Leaf(config) {
         newRow.marginY=i;
         this.rows.push(newRow);
     }
+
+    this.calculateMinVeinDistances();
 
 }
 
@@ -96,3 +95,16 @@ Leaf.prototype.grow = function() {
     }
 };
 
+Leaf.prototype.calculateMinVeinDistances = function() {
+    for(var i = 0 ; i < this.rows.length ; i++) {
+        var nextVeinIndex = 0;
+        var prevVeinIndex = null;
+        if(i == this.config.veins[nextVeinIndex]) {
+            this.rows[i].minVeinDistance = 0;
+            prevVeinIndex = 0;
+            nextVeinIndex ++; //TODO check that we've not gone past last one.
+        } else {
+            this.rows[i].minVeinDistance = this.config.veins[nextVeinIndex] - i;
+        }
+    }
+}

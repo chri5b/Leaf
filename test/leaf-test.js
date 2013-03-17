@@ -31,8 +31,8 @@ module("Grow leaf, grow");
 test("grow()", function() {
     var myLeaf = new Leaf();
     myLeaf.grow();
-    deepEqual(myLeaf.rows[0],{midY:0,marginY:0,marginX:1},"Initial row stays 0 across the board");
-    deepEqual(myLeaf.rows[9],{midY:9.9,marginY:9.9,marginX:1},"Last row grows longer but width is 0");
+    deepEqual(myLeaf.rows[0],{midY:0,marginY:0,marginX:1,minVeinDistance:3},"Initial row stays 0 across the board");
+    deepEqual(myLeaf.rows[9],{midY:9.9,marginY:9.9,marginX:1,minVeinDistance:2},"Last row grows longer but width is 0");
     equal(Math.round(myLeaf.rows[6].marginX*100)/100, 1.1, "Widest width grows at full growth rate");
     equal(Math.round(myLeaf.rows[2].marginX*1000)/1000, 1.036, "Near the stem width grows less");
     equal(Math.round(myLeaf.rows[8].marginX*1000)/1000, 1.075, "Near the tip width grows less");
@@ -57,7 +57,7 @@ test( "Different growth factor coefficient changes leaf growth", function() {
     };
     var myLeaf = new Leaf(config);
     myLeaf.grow();
-    deepEqual(myLeaf.rows[0],{midY:0,marginY:0,marginX:1},"Initial row stays 0 across the board");
+    deepEqual(myLeaf.rows[0],{midY:0,marginY:0,marginX:1,minVeinDistance:3},"Initial row stays 0 across the board");
     equal(Math.round(myLeaf.rows[9].marginY*10)/10,10.8,"Last row grows longer but width is 0");
     equal(Math.round(myLeaf.rows[6].marginX*100)/100, 1.2, "Widest width grows at full growth rate");
     equal(Math.round(myLeaf.rows[2].marginX*1000)/1000, 1.072, "Near the stem width grows less");
@@ -77,4 +77,13 @@ test( "Different choice of max leaf width has impact on leaf shape", function() 
     equal( Math.round(myLeaf.getTipDistanceMultiplier(2)*100)/100,0.56, "Row 2 returns 0.56");
     equal( Math.round(myLeaf.getTipDistanceMultiplier(8)*100)/100,0.56, "Row 8 returns 0.56");
 
+});
+
+module("Vein Distance")
+test("Vein Distance", function() {
+    var myLeaf = new Leaf();
+    equal(myLeaf.rows[2].minVeinDistance,1,"Row before first vein calculates distance correctly");
+    equal(myLeaf.rows[3].minVeinDistance,0,"Row which is a vein has min distance 0");
+    equal(myLeaf.rows[5].minVeinDistance,2,"Row between veins calculates distance correctly");
+    equal(myLeaf.rows[8].minVeinDistance,1,"Row after last vein calculates distance correctly");
 });
