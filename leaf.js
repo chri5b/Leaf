@@ -30,10 +30,10 @@ function Leaf(config) {
         this.config.veins = [3,7];
     }
     if(!this.config.veinDistanceA) {
-        this.config.veinDistanceA = 3;
+        this.config.veinDistanceA = 0.5;
     }
     if(!this.config.veinDistanceB) {
-        this.config.veinDistanceB = 1.2;
+        this.config.veinDistanceB = 0.9;
     }
     if(!this.config.slope) {
         this.config.slope = 0;
@@ -43,9 +43,9 @@ function Leaf(config) {
 
     for (var i = 0; i < this.config.n ; i++) {
         var newRow = {};
-        newRow.midY=i;
+        newRow.midY=i/this.config.n;
         newRow.marginX=1;
-        newRow.marginY=i;
+        newRow.marginY=i/this.config.n;
         this.rows.push(newRow);
     }
 
@@ -96,15 +96,36 @@ Leaf.prototype.grow = function() {
 };
 
 Leaf.prototype.calculateMinVeinDistances = function() {
+    var nextVeinIndex = 0;
+    var prevVeinIndex = null;
     for(var i = 0 ; i < this.rows.length ; i++) {
-        var nextVeinIndex = 0;
-        var prevVeinIndex = null;
+
         if(i == this.config.veins[nextVeinIndex]) {
             this.rows[i].minVeinDistance = 0;
-            prevVeinIndex = 0;
-            nextVeinIndex ++; //TODO check that we've not gone past last one.
+            //We've hit a vein, so update our pointers to previous and next veins
+            prevVeinIndex = nextVeinIndex;
+            if(nextVeinIndex<this.config.veins.length-1) {
+                //If there is a next vein - update pointer to it
+                nextVeinIndex ++;
+            } else {
+                nextVeinIndex = null;
+            }
         } else {
-            this.rows[i].minVeinDistance = this.config.veins[nextVeinIndex] - i;
+            //calculate distance to nearest veins, taking into account that you might be before the first one or after the last one
+            if(nextVeinIndex!=null&&prevVeinIndex!=null) {
+                this.rows[i].minVeinDistance = Math.min(Math.abs(this.config.veins[nextVeinIndex] - i),Math.abs(i - this.config.veins[prevVeinIndex]));
+            } else if (nextVeinIndex!=null&&prevVeinIndex==null) {
+                this.rows[i].minVeinDistance = Math.abs(this.config.veins[nextVeinIndex] - i)
+            } else if (nextVeinIndex==null&&prevVeinIndex!=null) {
+                this.rows[i].minVeinDistance = Math.abs(i - this.config.veins[prevVeinIndex])
+            }
+
         }
     }
+}
+
+Leaf.prototype.calculateVeinDistanceMultiplier = function(index) {
+    var multipliedVeinDistance = this.config.veinDistanceA * this.rows[index].minVeinDistance;
+    var poweredVeinDistance = Math.pow(multipliedVeinDistance,this.config.veinDistanceB);
+    return Math.exp(poweredVeinDistance*-1);
 }
