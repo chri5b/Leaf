@@ -7,22 +7,61 @@
 </head>
 <body>
     <div id="visualisation"></div>
+    <button id="click">grow</button>
     <script>
         var vis = d3.select('#visualisation');
-        var myLeaf = new Leaf({n:100,veins:[30.60,90],maxI:35});
-        for(var i = 0 ; i < 100 ; i++) {
-            myLeaf.grow();
+        var myLeaf = new Leaf({n:100,veins:[20,50,70],Yd:30,veinDistanceB:1,veinDistanceA:0.01,k:3,R:1.2,slope:0.7});
+
+        var g = vis.append("svg").append("svg:g");
+
+        function draw() {
+            var dataLines = g.selectAll('.rLines .lLines')
+                    .data([myLeaf.rows],function(d,i) {return i;});
+
+            var xScale = d3.scale.linear()
+                    .domain([-500,500])
+                    .range([10,100]);
+
+            var yScale = d3.scale.linear()
+                    .domain([0,1000])
+                    .range([100,10]);
+
+            var line = d3.svg.line()
+                    .x(function(d) { return xScale(d.marginX); })
+                    .y(function(d) { return yScale(d.marginY); })
+                    .interpolate("basis");
+
+            var leftLine = d3.svg.line()
+                    .x(function(d) { return xScale(-d.marginX);})
+                    .y(function(d) {return yScale(d.marginY);})
+                    .interpolate("basis");
+
+            dataLines.enter().append('path')
+                 .attr('class','rLines')
+                 .attr("d", line(myLeaf.rows));
+
+            dataLines.enter().append('path')
+                    .attr('class','lLines')
+                    .attr("d", leftLine(myLeaf.rows));
+
+            dataLines.transition()
+                    .attr("d",line(myLeaf.rows))
+                    .attr("d", leftLine(myLeaf.rows));
         }
-        vis.data(myLeaf.rows);
-        var line = d3.svg.line()
-                .x(function(d) { return d.marginX; })
-                .y(function(d) { return d.marginY; })
-                .interpolate("basis");
 
-        vis.append("svg:path")
-                .attr("d", line);
+        d3.select("#click").on('click', growLeaf);
 
+        function growLeaf() {
+            for(var i = 0 ; i < 5 ; i++) {
+                if(myLeaf.rows[myLeaf.rows.length-1].midY < 1000) {
+                    myLeaf.grow();
 
+                } else {
+                    break;
+                }
+            }
+            draw();
+        }
     </script>
 </body>
 </html>

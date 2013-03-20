@@ -12,8 +12,8 @@ test("We should have a leaf object",function() {
 
     ok(myLeaf.config.n == 10,"number of rows is configured to be 10");
     ok(myLeaf.rows.length == 10, "number of rows is actually 10");
-    ok(myLeaf.config.maxI == 6,"row with max width is 6");
-    ok(myLeaf.config.elongation == 2, "elongation coefficient is 2")
+    ok(myLeaf.config.Yd == 6,"row with max width is 6");
+    ok(myLeaf.config.k == 2, "elongation coefficient is 2")
 });
 
 module("Tip Distance");
@@ -41,7 +41,7 @@ test("grow()", function() {
 module("Config");
 test( "Different elongation coefficient changes leaf shape", function() {
     var config = {
-        elongation:3      //Affects global leaf shape
+        k:3      //Affects global leaf shape
     };
     var myLeaf = new Leaf(config);
     ok( myLeaf.getTipDistanceMultiplier(0) == 0 , "Initial Row returns 0" );
@@ -67,7 +67,7 @@ test( "Different growth factor coefficient changes leaf growth", function() {
 
 test( "Different choice of max leaf width has impact on leaf shape", function() {
     var config = {
-        maxI:4
+        Yd:4
     };
     var myLeaf = new Leaf(config);
     equal( myLeaf.getTipDistanceMultiplier(0),0 , "Initial Row returns 0" );
@@ -97,7 +97,7 @@ test("Vein distance growth rate", function() {
 
 module("let 100 flowers bloom")
 test("or something", function() {
-    var myLeaf = new Leaf({n:100,veins:[30.60,90],maxI:35});
+    var myLeaf = new Leaf({n:100,veins:[30.60,90],Yd:35});
     myLeaf.grow();
     equal(1,2,"doh");
     for(var i = 0 ; i < 100 ; i++) {
