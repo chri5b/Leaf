@@ -31,11 +31,11 @@ module("Grow leaf, grow");
 test("grow()", function() {
     var myLeaf = new Leaf();
     myLeaf.grow();
-    deepEqual(myLeaf.rows[0],{midY:0,marginY:0,marginX:1,minVeinDistance:3},"Initial row stays 0 across the board");
-    equal(Math.round(myLeaf.rows[9].midY*100)/100,0.99,"Last row grows longer but width is 0");
-    equal(Math.round(myLeaf.rows[6].marginX*100)/100, 1.1, "Widest width grows at full growth rate");
-    equal(Math.round(myLeaf.rows[2].marginX*1000)/1000, 1.036, "Near the stem width grows less");
-    equal(Math.round(myLeaf.rows[8].marginX*1000)/1000, 1.075, "Near the tip width grows less");
+    deepEqual(myLeaf.rows[0],{cellRowElongation:1,midY:0,marginY:0,marginX:1,minVeinDistance:3},"Initial row stays 0 across the board");
+    equal(Math.round(myLeaf.rows[9].midY*100)/100,1.01,"Last row grows longer but width is 0");
+    equal(Math.round(myLeaf.rows[6].marginX*100)/100, 1.06, "Widest width grows at full growth rate");
+    equal(Math.round(myLeaf.rows[2].marginX*1000)/1000, 1.022, "Near the stem width grows less");
+    equal(Math.round(myLeaf.rows[8].marginX*1000)/1000, 1.045, "Near the tip width grows less");
 });
 
 module("Config");
@@ -57,11 +57,11 @@ test( "Different growth factor coefficient changes leaf growth", function() {
     };
     var myLeaf = new Leaf(config);
     myLeaf.grow();
-    deepEqual(myLeaf.rows[0],{midY:0,marginY:0,marginX:1,minVeinDistance:3},"Initial row stays 0 across the board");
+    deepEqual(myLeaf.rows[0],{cellRowElongation:1,midY:0,marginY:0,marginX:1,minVeinDistance:3},"Initial row stays 0 across the board");
     equal(Math.round(myLeaf.rows[9].marginY*10)/10,1.1,"Last row grows longer but width is 0");
-    equal(Math.round(myLeaf.rows[6].marginX*100)/100, 1.2, "Widest width grows at full growth rate");
-    equal(Math.round(myLeaf.rows[2].marginX*1000)/1000, 1.072, "Near the stem width grows less");
-    equal(Math.round(myLeaf.rows[8].marginX*1000)/1000, 1.150, "Near the tip width grows less");
+    equal(Math.round(myLeaf.rows[6].marginX*100)/100, 1.12, "Widest width grows at full growth rate");
+    equal(Math.round(myLeaf.rows[2].marginX*1000)/1000, 1.044, "Near the stem width grows less");
+    equal(Math.round(myLeaf.rows[8].marginX*1000)/1000, 1.091, "Near the tip width grows less");
 
 });
 
@@ -90,17 +90,21 @@ test("Vein Distance", function() {
 
 test("Vein distance growth rate", function() {
     var myLeaf = new Leaf();
-    equal(Math.round(myLeaf.calculateVeinDistanceMultiplier(0)*100)/100,0.24,"Row 3 away from vein has low growth");
+    equal(Math.round(myLeaf.calculateVeinDistanceMultiplier(0)*100)/100,0.26,"Row 3 away from vein has low growth");
     equal(myLeaf.calculateVeinDistanceMultiplier(3),1,"Row which is a vein has full growth");
-    equal(Math.round(myLeaf.calculateVeinDistanceMultiplier(4)*100)/100,0.59,"Row 1 away from vein has pretty high growth");
-})
+    equal(Math.round(myLeaf.calculateVeinDistanceMultiplier(4)*100)/100,0.61,"Row 1 away from vein has pretty high growth");
+});
 
-module("let 100 flowers bloom")
-test("or something", function() {
-    var myLeaf = new Leaf({n:100,veins:[30.60,90],Yd:35});
-    myLeaf.grow();
-    equal(1,2,"doh");
-    for(var i = 0 ; i < 100 ; i++) {
-        myLeaf.grow();
-    }
-})
+test("Vein Distance Vein Distance Multiplier", function() {
+    var myLeaf = new Leaf({veinDistanceB:1});
+    equal(Math.round(myLeaf.calculateVeinDistanceMultiplier(0)*100)/100,0.22,"Row 3 away from vein has low growth");
+    equal(myLeaf.calculateVeinDistanceMultiplier(3),1,"Row which is a vein has full growth");
+    equal(Math.round(myLeaf.calculateVeinDistanceMultiplier(4)*100)/100,0.61,"Row 1 away from vein has pretty high growth");
+});
+
+test("Vein Distance Vein Distance Exponent", function() {
+    var myLeaf = new Leaf({veinDistanceA:0.1});
+    equal(Math.round(myLeaf.calculateVeinDistanceMultiplier(0)*100)/100,0.76,"Row 3 away from vein has low growth");
+    equal(myLeaf.calculateVeinDistanceMultiplier(3),1,"Row which is a vein has full growth");
+    equal(Math.round(myLeaf.calculateVeinDistanceMultiplier(4)*100)/100,0.9,"Row 1 away from vein has pretty high growth");
+});

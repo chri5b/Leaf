@@ -6,7 +6,7 @@
     <script src="../leaf.js"></script>
 </head>
 <body>
-    <div id="visualisation"></div>
+    <div id="visualisation" style="width:600px;height:600px;"> </div>
     <button id="click">grow</button>
     <script>
         var vis = d3.select('#visualisation');
@@ -15,8 +15,11 @@
         var g = vis.append("svg").append("svg:g");
 
         function draw() {
-            var dataLines = g.selectAll('.rLines .lLines')
-                    .data([myLeaf.rows],function(d,i) {return i;});
+            var dataLinesR = g.selectAll('.rLines')
+                    .data([myLeaf.rows]);
+
+            var dataLinesL = g.selectAll('.lLines')
+                    .data([myLeaf.rows]);
 
             var xScale = d3.scale.linear()
                     .domain([-500,500])
@@ -36,26 +39,36 @@
                     .y(function(d) {return yScale(d.marginY);})
                     .interpolate("basis");
 
-            dataLines.enter().append('path')
-                 .attr('class','rLines')
-                 .attr("d", line(myLeaf.rows));
+            dataLinesR.enter()
+                    .append('path')
+                        .attr('class','rLines')
+                        .attr("d", line(myLeaf.rows));
 
-            dataLines.enter().append('path')
-                    .attr('class','lLines')
+            dataLinesL.enter()
+                    .append('path')
+                        .attr('class','lLines')
+                        .attr("d", leftLine(myLeaf.rows));
+
+            dataLinesR.transition()
+                    .attr("d",line(myLeaf.rows));
+
+            dataLinesL.transition()
                     .attr("d", leftLine(myLeaf.rows));
 
-            dataLines.transition()
-                    .attr("d",line(myLeaf.rows))
-                    .attr("d", leftLine(myLeaf.rows));
+            dataLinesR.exit()
+                    .remove();
+
+            dataLinesL.exit().remove();
         }
 
         d3.select("#click").on('click', growLeaf);
 
         function growLeaf() {
-            for(var i = 0 ; i < 5 ; i++) {
+            for(var i = 0 ; i < 100 ; i++) {
                 if(myLeaf.rows[myLeaf.rows.length-1].midY < 1000) {
-                    myLeaf.grow();
 
+                    myLeaf.grow();
+                    draw();
                 } else {
                     break;
                 }
